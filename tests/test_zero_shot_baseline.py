@@ -92,3 +92,17 @@ def test_model_config(tmp_path: Path):
     cfg = load_model_config(path, "m")
     assert cfg.key == "m"
     assert cfg.model == "demo"
+
+
+def test_model_config_base_url_env(tmp_path: Path, monkeypatch):
+    path = tmp_path / "models.json"
+    path.write_text(json.dumps({"models": {"m": {
+        "provider": "openai_compatible",
+        "base_url": "https://default.example/v1",
+        "base_url_env": "TEST_MODEL_BASE_URL",
+        "model": "demo"
+    }}}), encoding="utf-8")
+    monkeypatch.setenv("TEST_MODEL_BASE_URL", "https://override.example/v1/")
+    cfg = load_model_config(path, "m")
+    assert cfg.base_url == "https://override.example/v1"
+    assert cfg.base_url_env == "TEST_MODEL_BASE_URL"

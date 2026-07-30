@@ -33,6 +33,7 @@ class ModelConfig:
     base_url: str
     model: str
     api_key_env: str = ""
+    base_url_env: str = ""
     temperature: float = 0.0
     max_tokens: int = 512
     timeout_seconds: float = 120.0
@@ -53,12 +54,24 @@ class ModelConfig:
         required = [name for name in ("base_url", "model") if not raw.get(name)]
         if required:
             raise ModelConfigError(f"模型 {key!r} 缺少字段: {', '.join(required)}")
+        base_url_env = str(raw.get("base_url_env", ""))
+        configured_base_url = str(raw["base_url"])
+        resolved_base_url = (
+            os.environ.get(base_url_env, configured_base_url)
+            if base_url_env
+            else configured_base_url
+        )
+        if not resolved_base_url.strip():
+            raise ModelConfigError(
+                f"模型 {key!r} 的 base_url 为空；请设置 {base_url_env or 'base_url'}"
+            )
         return cls(
             key=key,
             provider=provider,
-            base_url=str(raw["base_url"]).rstrip("/"),
+            base_url=resolved_base_url.rstrip("/"),
             model=str(raw["model"]),
             api_key_env=str(raw.get("api_key_env", "")),
+            base_url_env=base_url_env,
             temperature=float(raw.get("temperature", 0.0)),
             max_tokens=int(raw.get("max_tokens", 512)),
             timeout_seconds=float(raw.get("timeout_seconds", 120.0)),
@@ -77,6 +90,7 @@ class ModelConfig:
             "base_url": self.base_url,
             "model": self.model,
             "api_key_env": self.api_key_env,
+            "base_url_env": self.base_url_env,
             "temperature": self.temperature,
             "max_tokens": self.max_tokens,
             "timeout_seconds": self.timeout_seconds,

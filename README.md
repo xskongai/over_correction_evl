@@ -1,5 +1,5 @@
-[# GIFR Zero-shot Baseline
-]([]())
+# GIFR Zero-shot Baseline
+
 本目录实现中文性别包容审查的多模型 zero-shot 直接改写基线。
 
 核心实验假设：模型收到同一条 zero-shot 指令后，若输出与原句不同，则视为触发了 `EDIT`。
@@ -27,11 +27,15 @@ pip install -e ".[dev]"
 cp .env.example .env
 ```
 
-在 `.env` 中设置：
+在 `.env` 中设置所需 provider 的 Key：
 
 ```bash
-DEEPSEEK_API_KEY=你的Key
+DEEPSEEK_API_KEY=你的DeepSeekKey
+DASHSCOPE_API_KEY=你的百炼Key
+ZHIPU_API_KEY=你的智谱Key
 ```
+
+Qwen/GLM 的详细配置与 401 排查见 [`API_MODELS.md`](API_MODELS.md)。
 
 ## 2. 先做 dry-run
 
@@ -81,6 +85,36 @@ python scripts/run_zero_shot.py \
 
 ```bash
 python scripts/run_zero_shot.py --dataset-kind negative --full --models deepseek_v4_flash
+```
+
+## 3A. 跑 Qwen 与 GLM
+
+先用 3 条检查 Key、区域和模型配置：
+
+```bash
+python scripts/run_zero_shot.py \
+  --dataset-kind negative \
+  --sample-size 3 \
+  --workers 1 \
+  --models qwen3_7_plus glm5_2_zhipu
+```
+
+比较时必须复用 DeepSeek 300 条实验生成的 `sample_manifest.jsonl`：
+
+```bash
+python scripts/run_zero_shot.py \
+  --manifest runs/zero_shot/<deepseek-suite>/sample_manifest.jsonl \
+  --workers 2 \
+  --requests-per-second 1 \
+  --models qwen3_7_plus glm5_2_zhipu
+```
+
+Qwen Flash/Plus/Max 规模档位：
+
+```bash
+python scripts/run_zero_shot.py \
+  --manifest runs/zero_shot/<deepseek-suite>/sample_manifest.jsonl \
+  --models qwen3_7_flash qwen3_7_plus qwen3_7_max
 ```
 
 ## 4. 公平比较多个模型

@@ -50,6 +50,109 @@
       "size_label": "api_flash",
       "parameter_count": "undisclosed",
       "notes": "Ablation only: same Flash model with thinking enabled."
+    },
+    "qwen3_7_flash": {
+      "provider": "openai_compatible",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "base_url_env": "DASHSCOPE_BASE_URL",
+      "api_key_env": "DASHSCOPE_API_KEY",
+      "model": "qwen3.7-flash-2026-07-15",
+      "temperature": 0.0,
+      "max_tokens": 512,
+      "timeout_seconds": 180,
+      "extra_body": {
+        "enable_thinking": false
+      },
+      "size_label": "api_flash",
+      "parameter_count": "undisclosed",
+      "notes": "Pinned Qwen 3.7 Flash snapshot; non-thinking zero-shot baseline."
+    },
+   "qwen3_7_plus": {
+      "provider": "openai_compatible",
+      "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+      "base_url_env": "DASHSCOPE_BASE_URL",
+      "api_key_env": "DASHSCOPE_API_KEY",
+      "model": "qwen3.7-plus",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 300,
+      "extra_body": {
+        "enable_thinking": true
+      },
+      "size_label": "api_plus",
+      "parameter_count": "undisclosed",
+      "notes": "Qwen 3.7 Plus Thinking through Singapore Token Plan."
+  },
+    "qwen3_7_max": {
+      "provider": "openai_compatible",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "base_url_env": "DASHSCOPE_BASE_URL",
+      "api_key_env": "DASHSCOPE_API_KEY",
+      "model": "qwen3.7-max-2026-06-08",
+      "temperature": 0.0,
+      "max_tokens": 512,
+      "timeout_seconds": 240,
+      "extra_body": {
+        "enable_thinking": false
+      },
+      "size_label": "api_max",
+      "parameter_count": "undisclosed",
+      "notes": "Pinned Qwen 3.7 Max snapshot; non-thinking zero-shot baseline."
+    },
+    "glm5_2_zhipu": {
+      "provider": "openai_compatible",
+      "base_url": "https://open.bigmodel.cn/api/paas/v4",
+      "base_url_env": "ZHIPU_BASE_URL",
+      "api_key_env": "ZHIPU_API_KEY",
+      "model": "glm-5.2",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "timeout_seconds": 240,
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        },
+        "do_sample": false
+      },
+      "size_label": "api_flagship",
+      "parameter_count": "undisclosed",
+      "notes": "Zhipu direct GLM-5.2; thinking and sampling disabled for deterministic baseline."
+    },
+    "glm5_2_dashscope": {
+      "provider": "openai_compatible",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "base_url_env": "DASHSCOPE_BASE_URL",
+      "api_key_env": "DASHSCOPE_API_KEY",
+      "model": "glm-5.2",
+      "temperature": 0.0,
+      "max_tokens": 1024,
+      "timeout_seconds": 240,
+      "extra_body": {
+        "enable_thinking": false
+      },
+      "size_label": "api_flagship",
+      "parameter_count": "undisclosed",
+      "notes": "Alibaba Model Studio GLM-5.2; China-region availability may be required."
+    },
+    "glm5_2_zhipu_thinking": {
+      "provider": "openai_compatible",
+      "base_url": "https://open.bigmodel.cn/api/paas/v4",
+      "base_url_env": "ZHIPU_BASE_URL",
+      "api_key_env": "ZHIPU_API_KEY",
+      "model": "glm-5.2",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 300,
+      "extra_body": {
+        "thinking": {
+          "type": "enabled"
+        },
+        "reasoning_effort": "max",
+        "do_sample": false
+      },
+      "size_label": "api_flagship",
+      "parameter_count": "undisclosed",
+      "notes": "GLM-5.2 with thinking enabled."
     }
   }
 }

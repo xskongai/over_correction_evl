@@ -6,6 +6,7 @@ src/gifr/baselines/compare.py
 src/gifr/baselines/dataset.py
 src/gifr/baselines/metrics.py
 src/gifr/baselines/models.py
+src/gifr/baselines/output.py
 src/gifr_zero_shot_baseline.egg-info/PKG-INFO
 src/gifr_zero_shot_baseline.egg-info/SOURCES.txt
 src/gifr_zero_shot_baseline.egg-info/dependency_links.txt
