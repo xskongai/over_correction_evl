@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+src/gifr/__init__.py
+src/gifr/baselines/__init__.py
+src/gifr/baselines/compare.py
+src/gifr/baselines/dataset.py
+src/gifr/baselines/metrics.py
+src/gifr/baselines/models.py
+src/gifr_zero_shot_baseline.egg-info/PKG-INFO
+src/gifr_zero_shot_baseline.egg-info/SOURCES.txt
+src/gifr_zero_shot_baseline.egg-info/dependency_links.txt
+src/gifr_zero_shot_baseline.egg-info/requires.txt
+src/gifr_zero_shot_baseline.egg-info/top_level.txt
+tests/test_zero_shot_baseline.py

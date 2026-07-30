@@ -1,0 +1,55 @@
+{
+  "models": {
+    "deepseek_v4_flash": {
+      "provider": "openai_compatible",
+      "base_url": "https://api.deepseek.com",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "model": "deepseek-v4-flash",
+      "temperature": 0.0,
+      "max_tokens": 512,
+      "timeout_seconds": 120,
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "size_label": "api_flash",
+      "parameter_count": "undisclosed",
+      "notes": "Primary direct zero-shot baseline; thinking explicitly disabled."
+    },
+    "deepseek_v4_pro": {
+      "provider": "openai_compatible",
+      "base_url": "https://api.deepseek.com",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "model": "deepseek-v4-pro",
+      "temperature": 0.0,
+      "max_tokens": 512,
+      "timeout_seconds": 180,
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "size_label": "api_pro",
+      "parameter_count": "undisclosed",
+      "notes": "Larger DeepSeek API baseline; thinking explicitly disabled."
+    },
+    "deepseek_v4_flash_thinking": {
+      "provider": "openai_compatible",
+      "base_url": "https://api.deepseek.com",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "model": "deepseek-v4-flash",
+      "temperature": 0.0,
+      "max_tokens": 512,
+      "timeout_seconds": 180,
+      "extra_body": {
+        "thinking": {
+          "type": "enabled"
+        }
+      },
+      "size_label": "api_flash",
+      "parameter_count": "undisclosed",
+      "notes": "Ablation only: same Flash model with thinking enabled."
+    }
+  }
+}
