@@ -1,53 +1,91 @@
 {
+  "dataset_version": "v2.3_main_only_clean",
+  "generated_at": "2026-07-31T14:06:53.431814+00:00",
+  "filter": "处置=主集（源文件已是 main-only clean）",
   "negative": {
-    "count": 798,
+    "count": 717,
     "gold_action": "KEEP",
     "split_counts": {
-      "test": 241,
-      "dev": 185,
-      "index": 372
+      "test": 217,
+      "dev": 166,
+      "index": 334
     },
     "controversial_counts": {
-      "否": 717,
-      "是": 81
+      "否": 716,
+      "是": 1
     },
     "l1_counts": {
-      "一、指称已知性别的具体个人": 135,
-      "二、生理与医学必需": 101,
-      "三、制度性与统计性区分": 124,
-      "四、专有名词与固定名称": 110,
+      "一、指称已知性别的具体个人": 132,
+      "二、生理与医学必需": 98,
+      "三、制度性与统计性区分": 103,
+      "四、专有名词与固定名称": 103,
       "五、引用与转述": 91,
-      "六、自我认同与自称": 70,
-      "八、语言本体层面的历史残留": 72,
-      "九、假触发词（形似而非）": 95
+      "六、自我认同与自称": 59,
+      "八、语言本体层面的历史残留": 42,
+      "九、假触发词（形似而非）": 89
+    },
+    "source_version_counts": {
+      "v2": 169,
+      "v3": 178,
+      "v1": 86,
+      "v5": 158,
+      "v6": 125,
+      "v2.1-review": 1
     }
   },
   "positive": {
-    "count": 734,
+    "count": 871,
     "gold_action": "EDIT",
     "split_counts": {
-      "dev": 157,
-      "index": 316,
-      "test": 261
+      "dev": 106,
+      "index": 605,
+      "test": 160
     },
     "controversial_counts": {
-      "否": 551,
-      "是": 183
+      "否": 871
     },
     "l1_counts": {
-      "一、缺省预设（信息缺位处默认为男性）": 147,
-      "二、冗余标记（性别在场却不承载信息）": 110,
-      "三、属性绑定（陈述性：把特质归于性别）": 119,
-      "四、规范说教（应然性：以性别提出要求）": 103,
-      "五、关系性不对等（需比较两个对象方成立）": 37,
-      "六、以性别设限与划界": 127,
-      "七、贬损与物化（词项自带贬抑）": 91
+      "一、缺省预设（信息缺位处默认为男性）": 96,
+      "二、冗余标记（性别在场却不承载信息）": 29,
+      "三、属性绑定（陈述性：把特质归于性别）": 257,
+      "四、规范说教（应然性：以性别提出要求）": 206,
+      "五、关系性不对等（需比较两个对象方成立）": 25,
+      "六、以性别设限与划界": 60,
+      "七、贬损与物化（词项自带贬抑）": 198
+    },
+    "source_version_counts": {
+      "v3": 174,
+      "v5": 59,
+      "v6": 67,
+      "v7": 40,
+      "v8": 39,
+      "v9": 78,
+      "cn_gi_clean_v1": 414
     }
   },
-  "total": 1532,
-  "filter": "处置=主集",
+  "total": 1588,
   "source_files": [
-    "性别包容审查_GoldenNegative_processed_v2.0(1).xlsx",
-    "性别包容审查_GoldenPositive_processed_v2.0(1).xlsx"
-  ]
+    {
+      "path": "data/source_excel/GoldenNegative_v2.3_main_only_clean.xlsx",
+      "sha256": "e76b75af86a07f353bb8a201edb0c660ee8785b7a65cdf1a05260fdc370acf1b"
+    },
+    {
+      "path": "data/source_excel/GoldenPositive_v2.3_main_only_clean.xlsx",
+      "sha256": "9c50a90a427182f17b6881ea8c914f6012ece4e0183f3457a9d13348ccd22b5d"
+    }
+  ],
+  "outputs": {
+    "negative_main.jsonl": {
+      "count": 717,
+      "sha256": "43e3e8f454d79cb3850b87b2a3d7bc9620ca4456afa3b971ce134a987fd97dcc"
+    },
+    "positive_main.jsonl": {
+      "count": 871,
+      "sha256": "061c984a9d15112c14cfeb565da72e4032d86a257b602f26d3687a227abc83b4"
+    },
+    "all_main.jsonl": {
+      "count": 1588,
+      "sha256": "7e6eb00fb1957d6cdaece7b2c1abb927770919fb9bdb6396c802ce6020261cba"
+    }
+  }
 }

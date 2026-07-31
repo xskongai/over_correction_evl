@@ -67,7 +67,7 @@
       "parameter_count": "undisclosed",
       "notes": "Pinned Qwen 3.7 Flash snapshot; non-thinking zero-shot baseline."
     },
-   "qwen3_7_plus": {
+    "qwen3_7_plus": {
       "provider": "openai_compatible",
       "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
       "base_url_env": "DASHSCOPE_BASE_URL",
@@ -82,7 +82,7 @@
       "size_label": "api_plus",
       "parameter_count": "undisclosed",
       "notes": "Qwen 3.7 Plus Thinking through Singapore Token Plan."
-  },
+    },
     "qwen3_7_max": {
       "provider": "openai_compatible",
       "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
@@ -166,7 +166,8 @@
       },
       "size_label": "local_9b",
       "parameter_count": "9B",
-      "notes": "Local Qwen3.5 9B via Ollama with thinking enabled."
+      "notes": "Local Qwen3.5 9B via Ollama with thinking enabled.",
+      "runtime": "ollama"
     },
     "qwen3_5_9b_ollama": {
       "provider": "openai_compatible",
@@ -180,7 +181,8 @@
       },
       "size_label": "local_9b",
       "parameter_count": "9B",
-      "notes": "Local Qwen3.5 9B, thinking disabled."
+      "notes": "Local Qwen3.5 9B, thinking disabled.",
+      "runtime": "ollama"
     },
     "glm4_9b_ollama": {
       "provider": "openai_compatible",
@@ -191,7 +193,8 @@
       "timeout_seconds": 600,
       "size_label": "local_9b",
       "parameter_count": "9B",
-      "notes": "Local GLM4 9B via Ollama."
+      "notes": "Local GLM4 9B via Ollama.",
+      "runtime": "ollama"
     },
     "deepseek_r1_8b_ollama": {
       "provider": "openai_compatible",
@@ -205,7 +208,8 @@
       },
       "size_label": "local_8b",
       "parameter_count": "8B",
-      "notes": "Local DeepSeek-R1 8B via Ollama, low reasoning effort."
+      "notes": "Local DeepSeek-R1 8B via Ollama, low reasoning effort.",
+      "runtime": "ollama"
     },
     "llama3_1_8b_ollama": {
       "provider": "openai_compatible",
@@ -216,7 +220,8 @@
       "timeout_seconds": 600,
       "size_label": "local_8b",
       "parameter_count": "8B",
-      "notes": "Local Llama 3.1 8B via Ollama."
+      "notes": "Local Llama 3.1 8B via Ollama.",
+      "runtime": "ollama"
     },
     "mistral_7b_ollama": {
       "provider": "openai_compatible",
@@ -227,7 +232,8 @@
       "timeout_seconds": 600,
       "size_label": "local_7b",
       "parameter_count": "7B",
-      "notes": "Local Mistral 7B v0.3 via Ollama."
+      "notes": "Local Mistral 7B v0.3 via Ollama.",
+      "runtime": "ollama"
     }
   }
 }

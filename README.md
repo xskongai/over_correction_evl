@@ -10,11 +10,11 @@
 
 ## 当前数据
 
-从新工作簿的 `数据集` sheet 中只导出 `处置=主集`：
+当前使用 v2.3 main-only clean 工作簿；`数据集` sheet 中的记录均为 `处置=主集`：
 
-- `data/source_jsonl/negative_main.jsonl`：798 条
-- `data/source_jsonl/positive_main.jsonl`：734 条
-- `data/source_jsonl/all_main.jsonl`：1532 条
+- `data/source_jsonl/negative_main.jsonl`：717 条
+- `data/source_jsonl/positive_main.jsonl`：871 条
+- `data/source_jsonl/all_main.jsonl`：1588 条
 
 正式运行链路只读取 JSON/JSONL，Excel 只作为人工维护源。
 
@@ -43,11 +43,28 @@ Qwen/GLM 的详细配置与 401 排查见 [`API_MODELS.md`](API_MODELS.md)。
 python scripts/run_zero_shot.py \
   --dataset-kind negative \
   --sample-size 100 \
-  --models deepseek_v4_flash \
+  --models qwen3_5_9b_ollama \
   --dry-run
 ```
 
 Dry-run 会原样回显输入。Negative 上应得到 0% over-edit，用于验证数据、抽样和指标代码。
+
+
+## 2A. v2.3 clean 小模型重测
+
+先跑五个小模型各 100 条（同一 suite、同一 manifest）：
+
+```bash
+./run_all_small_models.sh 100
+```
+
+确认后跑 Golden Negative 全量 717 条：
+
+```bash
+./run_all_small_models.sh full
+```
+
+详细命令见 [`command.md`](command.md)。
 
 ## 3. 跑 DeepSeek
 
@@ -193,8 +210,8 @@ python scripts/run_zero_shot.py --dataset-kind negative --sample-size 300 --mode
 
 ```bash
 python scripts/export_main_jsonl.py \
-  --negative /path/to/GoldenNegative.xlsx \
-  --positive /path/to/GoldenPositive.xlsx \
+  --negative data/source_excel/GoldenNegative_v2.3_main_only_clean.xlsx \
+  --positive data/source_excel/GoldenPositive_v2.3_main_only_clean.xlsx \
   --output-dir data/source_jsonl
 ```
 

@@ -1,0 +1,13 @@
+{
+  "dataset_version": "v2.3_main_only_clean",
+  "negative_source": "data/source_excel/GoldenNegative_v2.3_main_only_clean.xlsx",
+  "positive_source": "data/source_excel/GoldenPositive_v2.3_main_only_clean.xlsx",
+  "negative_count": 717,
+  "positive_count": 871,
+  "total_count": 1588,
+  "outputs": {
+    "negative": "data/source_jsonl/negative_main.jsonl",
+    "positive": "data/source_jsonl/positive_main.jsonl",
+    "all": "data/source_jsonl/all_main.jsonl"
+  }
+}
