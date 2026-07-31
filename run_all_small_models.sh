@@ -34,3 +34,7 @@ python scripts/run_zero_shot.py \
   --max-retries 0 \
   --models "${MODEL_KEYS[@]}" \
   "$@"
+
+echo
+echo "模型运行结束，正在生成论文结果表……"
+python scripts/summarize_run.py --require-complete

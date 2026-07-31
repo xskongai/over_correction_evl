@@ -1,4 +1,4 @@
-.PHONY: install export-baseline-data zero-shot test clean
+.PHONY: install export-baseline-data zero-shot summarize test clean
 
 install:
 	pip install -e ".[dev]"
@@ -13,6 +13,9 @@ zero-shot:
 	  --dataset-kind $(or $(KIND),negative) \
 	  --sample-size $(or $(N),100) \
 	  --models $(or $(MODELS),deepseek_v4_flash) $(ARGS)
+
+summarize:
+	python scripts/summarize_run.py
 
 test:
 	pytest

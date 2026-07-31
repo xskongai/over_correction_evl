@@ -32,6 +32,13 @@ python scripts/run_zero_shot.py \
 ./run_all_small_models.sh 100
 ```
 
+命令结束后会自动生成最新一次运行的论文结果表，位置为：
+
+```text
+runs/zero_shot/<本次suite>/paper_tables/README.md
+runs/zero_shot/<本次suite>/paper_tables/model_summary.csv
+```
+
 五个模型会共享同一份 `sample_manifest.jsonl`，便于直接比较：
 
 - Qwen3.5-9B
@@ -79,3 +86,23 @@ python scripts/run_zero_shot.py \
 ```
 
 注意：Positive 的 `edit_trigger_rate` 只表示模型是否改动了原句，不等同于改写正确率。
+
+## 7. 重新汇总最新一次运行
+
+无需重新调用模型：
+
+```bash
+./summarize_latest_run.sh
+```
+
+汇总指定目录：
+
+```bash
+python scripts/summarize_run.py runs/zero_shot/<suite目录名>
+```
+
+只接受五个模型均已完成、样本数一致的结果：
+
+```bash
+python scripts/summarize_run.py runs/zero_shot/<suite目录名> --require-complete
+```

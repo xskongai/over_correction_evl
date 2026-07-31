@@ -10,7 +10,7 @@
 
 ## 当前数据
 
-当前使用 v2.3 main-only clean 工作簿；`数据集` sheet 中的记录均为 `处置=主集`：
+从新工作簿的 `数据集` sheet 中只导出 `处置=主集`：
 
 - `data/source_jsonl/negative_main.jsonl`：717 条
 - `data/source_jsonl/positive_main.jsonl`：871 条
@@ -43,28 +43,11 @@ Qwen/GLM 的详细配置与 401 排查见 [`API_MODELS.md`](API_MODELS.md)。
 python scripts/run_zero_shot.py \
   --dataset-kind negative \
   --sample-size 100 \
-  --models qwen3_5_9b_ollama \
+  --models deepseek_v4_flash \
   --dry-run
 ```
 
 Dry-run 会原样回显输入。Negative 上应得到 0% over-edit，用于验证数据、抽样和指标代码。
-
-
-## 2A. v2.3 clean 小模型重测
-
-先跑五个小模型各 100 条（同一 suite、同一 manifest）：
-
-```bash
-./run_all_small_models.sh 100
-```
-
-确认后跑 Golden Negative 全量 717 条：
-
-```bash
-./run_all_small_models.sh full
-```
-
-详细命令见 [`command.md`](command.md)。
 
 ## 3. 跑 DeepSeek
 
@@ -210,9 +193,40 @@ python scripts/run_zero_shot.py --dataset-kind negative --sample-size 300 --mode
 
 ```bash
 python scripts/export_main_jsonl.py \
-  --negative data/source_excel/GoldenNegative_v2.3_main_only_clean.xlsx \
-  --positive data/source_excel/GoldenPositive_v2.3_main_only_clean.xlsx \
+  --negative /path/to/GoldenNegative.xlsx \
+  --positive /path/to/GoldenPositive.xlsx \
   --output-dir data/source_jsonl
 ```
 
 该脚本只用于数据准备；正式 baseline 不依赖 Excel。
+## 9. 自动生成论文结果表
+
+五个小模型通过 `run_all_small_models.sh` 跑完后，会自动汇总最新一次 suite。也可以单独执行：
+
+```bash
+./summarize_latest_run.sh
+```
+
+指定某次运行目录：
+
+```bash
+python scripts/summarize_run.py \
+  runs/zero_shot/20260731T151151+0100_negative_100_seed42
+```
+
+结果写入该次运行的 `paper_tables/`：
+
+```text
+paper_tables/
+├── README.md                       # 可直接查看和复制的主结果表
+├── model_summary.csv               # 完整模型级指标
+├── model_summary.json              # 原始汇总，便于复现
+├── l1_negative_over_edit.csv/.md   # L1 类别分解
+├── difficulty_negative_over_edit.csv/.md
+└── register_negative_over_edit.csv/.md
+```
+
+主表优先展示 `NEG Content Over-edit`，同时保留 KEEP preservation、95% Wilson
+置信区间、strict over-edit、格式违规率和失败数。脚本会校验五个模型是否使用同一
+manifest、每个模型的实际样本数是否与 suite 一致；发现未跑完的数据时会明确警告。
+
