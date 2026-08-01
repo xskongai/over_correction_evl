@@ -1,108 +1,112 @@
-# v2.3 clean 数据重新测试命令
+# Model execution commands
 
-当前数据：
+模型运行与结果汇总完全分离：
 
-- Golden Negative：717 条（KEEP，用于 overcorrection / over-edit）
-- Golden Positive：871 条（EDIT，用于 edit-trigger 与后续改写质量评估）
-- 总计：1588 条
+- `run_models.sh`：只运行模型并保存原始结果。
+- `summarize_latest_run.sh` / `scripts/summarize_run.py`：只汇总已有结果。
 
-## 1. 进入项目
-
-```bash
-cd over_correction_eval_v2.3_clean
-source .venv/bin/activate
-```
-
-## 2. 先做 dry-run，确认新数据已生效
+## 1. 查看可用模型组和 model key
 
 ```bash
-python scripts/run_zero_shot.py \
-  --dataset-kind negative \
-  --sample-size 5 \
-  --seed 42 \
-  --models qwen3_5_9b_ollama \
-  --dry-run
+./run_models.sh --list-targets
 ```
 
-输出中应显示本次样本来自新的 `negative_main.jsonl`，dry-run 的 over-edit 应为 0。
+模型组在 `configs/models/model_groups.json` 中维护。
 
-## 3. 推荐：先重新跑五个小模型各 100 条
+## 2. 单独运行一个模型
+
+```bash
+./run_models.sh qwen3_5_9b_ollama 100
+```
+
+任意配置中的 model key 都可以直接使用：
+
+```bash
+./run_models.sh deepseek_v4_pro 100
+```
+
+## 3. 运行全部小模型
+
+```bash
+./run_models.sh small 100
+```
+
+兼容旧命令：
 
 ```bash
 ./run_all_small_models.sh 100
 ```
 
-命令结束后会自动生成最新一次运行的论文结果表，位置为：
-
-```text
-runs/zero_shot/<本次suite>/paper_tables/README.md
-runs/zero_shot/<本次suite>/paper_tables/model_summary.csv
-```
-
-五个模型会共享同一份 `sample_manifest.jsonl`，便于直接比较：
-
-- Qwen3.5-9B
-- GLM4-9B
-- DeepSeek-R1-8B
-- Llama-3.1-8B
-- Mistral-7B
-
-## 4. 100 条确认无误后，跑 Golden Negative 全量 717 条
+## 4. 运行全部大模型
 
 ```bash
-./run_all_small_models.sh full
+./run_models.sh large 100
 ```
 
-## 5. 单独跑某个模型
+## 5. 运行大模型和小模型全集
 
 ```bash
-python scripts/run_zero_shot.py \
-  --dataset-kind negative \
-  --full \
-  --seed 42 \
-  --workers 1 \
-  --max-retries 0 \
-  --models qwen3_5_9b_ollama
+./run_models.sh all 100
 ```
 
-将最后一行模型 key 替换为：
+`all` 指论文主实验的 3 个大模型和 5 个小模型，不包含 thinking/flash 等消融配置。
+同一次命令中的模型共享同一个 `sample_manifest.jsonl`。
 
-```text
-glm4_9b_ollama
-deepseek_r1_8b_ollama
-llama3_1_8b_ollama
-mistral_7b_ollama
-```
-
-## 6. Positive 数据冒烟测试
+## 6. 跑全量数据
 
 ```bash
-python scripts/run_zero_shot.py \
-  --dataset-kind positive \
-  --sample-size 100 \
-  --seed 42 \
-  --workers 1 \
-  --models qwen3_5_9b_ollama
+./run_models.sh small full
+./run_models.sh large full
+./run_models.sh all full
 ```
 
-注意：Positive 的 `edit_trigger_rate` 只表示模型是否改动了原句，不等同于改写正确率。
+默认数据类型是 `negative`。其他数据类型通过参数覆盖：
 
-## 7. 重新汇总最新一次运行
+```bash
+./run_models.sh all 100 --dataset-kind mixed
+./run_models.sh large 100 --dataset-kind positive
+```
 
-无需重新调用模型：
+## 7. 指定多个自定义模型
+
+使用逗号分隔：
+
+```bash
+./run_models.sh qwen3_5_9b_ollama,deepseek_v4_pro 100
+```
+
+## 8. Dry-run 和命令预览
+
+只查看将运行什么，不创建运行目录：
+
+```bash
+./run_models.sh all 100 --show-command
+```
+
+执行完整管线但不调用真实模型：
+
+```bash
+./run_models.sh all 10 --dry-run
+```
+
+## 9. 单独汇总结果
+
+汇总最新一次 suite：
 
 ```bash
 ./summarize_latest_run.sh
 ```
 
-汇总指定目录：
+要求 suite 中计划运行的模型全部完成：
 
 ```bash
-python scripts/summarize_run.py runs/zero_shot/<suite目录名>
+./summarize_latest_run.sh --require-complete
 ```
 
-只接受五个模型均已完成、样本数一致的结果：
+指定 suite：
 
 ```bash
-python scripts/summarize_run.py runs/zero_shot/<suite目录名> --require-complete
+python scripts/summarize_run.py \
+  runs/zero_shot/<suite目录名> \
+  --require-complete
 ```

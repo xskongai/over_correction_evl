@@ -106,3 +106,34 @@ def test_model_config_base_url_env(tmp_path: Path, monkeypatch):
     cfg = load_model_config(path, "m")
     assert cfg.base_url == "https://override.example/v1"
     assert cfg.base_url_env == "TEST_MODEL_BASE_URL"
+
+from gifr.baselines.model_selection import ModelSelectionError, resolve_targets
+
+
+def test_resolve_single_group_and_all_models():
+    models = ["large_a", "small_a", "small_b", "extra"]
+    groups = {
+        "small": {"members": ["small_a", "small_b"], "description": ""},
+        "large": {"members": ["large_a"], "description": ""},
+        "all": {"members": ["@large", "@small"], "description": ""},
+    }
+    assert resolve_targets(["small_a"], model_keys=models, groups=groups) == ["small_a"]
+    assert resolve_targets(["small"], model_keys=models, groups=groups) == ["small_a", "small_b"]
+    assert resolve_targets(["all"], model_keys=models, groups=groups) == [
+        "large_a", "small_a", "small_b"
+    ]
+
+
+def test_resolve_comma_targets_deduplicates():
+    models = ["a", "b"]
+    groups = {"pair": {"members": ["a", "b"], "description": ""}}
+    assert resolve_targets(["a,pair"], model_keys=models, groups=groups) == ["a", "b"]
+
+
+def test_resolve_unknown_target_fails():
+    try:
+        resolve_targets(["missing"], model_keys=["a"], groups={})
+    except ModelSelectionError as exc:
+        assert "未知模型或模型组" in str(exc)
+    else:
+        raise AssertionError("expected ModelSelectionError")

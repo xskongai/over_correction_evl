@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gifr-zero-shot-baseline"
-version = "0.3.1"
+version = "0.3.2"
 description = "Multi-model zero-shot over-editing baseline for Chinese gender-inclusive rewriting"
 requires-python = ">=3.10"
 dependencies = []

@@ -1,0 +1,38 @@
+{
+  "groups": {
+    "small": {
+      "description": "Five local 7B-9B Ollama models used as the small-model benchmark set.",
+      "members": [
+        "qwen3_5_9b_ollama",
+        "glm4_9b_ollama",
+        "deepseek_r1_8b_ollama",
+        "llama3_1_8b_ollama",
+        "mistral_7b_ollama"
+      ]
+    },
+    "large": {
+      "description": "Hosted API benchmark models, including GPT-4o and Gemini 3.6 Flash.",
+      "members": [
+        "deepseek_v4_flash_thinking",
+        "qwen3_7_plus",
+        "glm5_2_zhipu_thinking",
+        "gpt_4o",
+        "gemini_3_6_flash"
+      ]
+    },
+    "all": {
+      "description": "The complete benchmark set: large plus small models. Ablation-only configs are excluded.",
+      "members": [
+        "@large",
+        "@small"
+      ]
+    },
+    "openai_google": {
+      "description": "GPT-4o and Gemini 3.6 Flash",
+      "members": [
+        "gpt_4o",
+        "gemini_3_6_flash"
+      ]
+    }
+  }
+}

@@ -1,22 +1,22 @@
 # GIFR Zero-shot Baseline
 
-本目录实现中文性别包容审查的多模型 zero-shot 直接改写基线。
+本项目用于评估中文性别包容改写中的 over-edit / overcorrection。
 
-核心实验假设：模型收到同一条 zero-shot 指令后，若输出与原句不同，则视为触发了 `EDIT`。
+核心判定：模型收到统一 zero-shot 指令后，若输出与原句不同，则视为触发 `EDIT`。
 
-- Golden Negative：gold action 为 `KEEP`，任何实质变化计为 over-edit。
-- Golden Positive：gold action 为 `EDIT`，原样输出计为 no-edit；但“输出变化”不等于改写正确。
-- Mixed：报告 KEEP/EDIT 触发层面的代理分类指标。
+- Golden Negative：gold action 为 `KEEP`，实质变化计为 over-edit。
+- Golden Positive：gold action 为 `EDIT`，原样输出计为 no-edit；但“发生变化”不等于改写正确。
+- Mixed：报告 KEEP/EDIT 触发层面的代理指标。
 
 ## 当前数据
 
-从新工作簿的 `数据集` sheet 中只导出 `处置=主集`：
+只使用清理后工作簿中 `处置=主集` 的数据：
 
 - `data/source_jsonl/negative_main.jsonl`：717 条
 - `data/source_jsonl/positive_main.jsonl`：871 条
 - `data/source_jsonl/all_main.jsonl`：1588 条
 
-正式运行链路只读取 JSON/JSONL，Excel 只作为人工维护源。
+正式运行只读取 JSONL；Excel 是人工维护源。
 
 ## 1. 环境
 
@@ -27,7 +27,7 @@ pip install -e ".[dev]"
 cp .env.example .env
 ```
 
-在 `.env` 中设置所需 provider 的 Key：
+在 `.env` 中设置需要的 API Key：
 
 ```bash
 DEEPSEEK_API_KEY=你的DeepSeekKey
@@ -35,159 +35,210 @@ DASHSCOPE_API_KEY=你的百炼Key
 ZHIPU_API_KEY=你的智谱Key
 ```
 
-Qwen/GLM 的详细配置与 401 排查见 [`API_MODELS.md`](API_MODELS.md)。
+本地模型还需要启动 Ollama。详见 `LOCAL_MODELS.md`；API 模型详见 `API_MODELS.md`。
 
-## 2. 先做 dry-run
+## 2. 统一模型运行入口
 
-```bash
-python scripts/run_zero_shot.py \
-  --dataset-kind negative \
-  --sample-size 100 \
-  --models deepseek_v4_flash \
-  --dry-run
-```
-
-Dry-run 会原样回显输入。Negative 上应得到 0% over-edit，用于验证数据、抽样和指标代码。
-
-## 3. 跑 DeepSeek
-
-Negative 100 条：
+现有的 `scripts/run_zero_shot.py` 本身已经支持任意多个模型，并保证它们共享同一份
+`sample_manifest.jsonl`。在此基础上新增了一个很薄的通用入口：
 
 ```bash
-python scripts/run_zero_shot.py \
-  --dataset-kind negative \
-  --sample-size 100 \
-  --seed 42 \
-  --models deepseek_v4_flash
+./run_models.sh TARGET SIZE [其他 run_zero_shot.py 参数]
 ```
 
-同一批 300 条同时比较 Flash 与 Pro：
+`TARGET` 可以是：
+
+- 一个 model key；
+- 逗号分隔的多个 model key；
+- `small`、`large`、`all` 等模型组。
+
+`SIZE` 可以是正整数或 `full`，默认是 100。
+
+查看全部可用目标：
 
 ```bash
-python scripts/run_zero_shot.py \
-  --dataset-kind negative \
-  --sample-size 300 \
-  --seed 42 \
-  --models deepseek_v4_flash deepseek_v4_pro
+./run_models.sh --list-targets
 ```
 
-Mixed 300 条，默认 Negative/Positive 各 150 条：
+### 单独模型
 
 ```bash
-python scripts/run_zero_shot.py \
-  --dataset-kind mixed \
-  --sample-size 300 \
-  --seed 42 \
-  --models deepseek_v4_flash deepseek_v4_pro
+./run_models.sh qwen3_5_9b_ollama 100
+./run_models.sh deepseek_v4_pro 100
 ```
 
-全量必须显式指定：
+### 五个小模型
 
 ```bash
-python scripts/run_zero_shot.py --dataset-kind negative --full --models deepseek_v4_flash
+./run_models.sh small 100
 ```
 
-## 3A. 跑 Qwen 与 GLM
-
-先用 3 条检查 Key、区域和模型配置：
+### 三个大模型
 
 ```bash
-python scripts/run_zero_shot.py \
-  --dataset-kind negative \
-  --sample-size 3 \
-  --workers 1 \
-  --models qwen3_7_plus glm5_2_zhipu
+./run_models.sh large 100
 ```
 
-比较时必须复用 DeepSeek 300 条实验生成的 `sample_manifest.jsonl`：
+### 大模型和小模型全集
 
 ```bash
-python scripts/run_zero_shot.py \
-  --manifest runs/zero_shot/<deepseek-suite>/sample_manifest.jsonl \
-  --workers 2 \
-  --requests-per-second 1 \
-  --models qwen3_7_plus glm5_2_zhipu
+./run_models.sh all 100
 ```
 
-Qwen Flash/Plus/Max 规模档位：
+`all` 是论文主实验的 3 个大模型加 5 个小模型，不包含 thinking、flash 等消融配置。
+模型组定义集中在：
+
+```text
+configs/models/model_groups.json
+```
+
+以后增加或调整论文模型池，只改这个配置，不改运行代码。
+
+### 全量与其他数据类型
 
 ```bash
-python scripts/run_zero_shot.py \
-  --manifest runs/zero_shot/<deepseek-suite>/sample_manifest.jsonl \
-  --models qwen3_7_flash qwen3_7_plus qwen3_7_max
+./run_models.sh small full
+./run_models.sh large full
+./run_models.sh all full
+
+./run_models.sh all 100 --dataset-kind mixed
+./run_models.sh large 100 --dataset-kind positive
 ```
 
-## 4. 公平比较多个模型
+### 自定义组合
 
-一次命令中的所有模型共享同一份 `sample_manifest.jsonl`。输出结构：
+```bash
+./run_models.sh qwen3_5_9b_ollama,deepseek_v4_pro 100
+```
+
+### 检查而不运行
+
+只打印最终命令：
+
+```bash
+./run_models.sh all 100 --show-command
+```
+
+执行 dry-run 管线，不调用模型：
+
+```bash
+./run_models.sh all 10 --dry-run
+```
+
+## 3. 运行与汇总严格分离
+
+运行命令只做以下事情：
+
+1. 选择或读取样本 manifest；
+2. 调用模型；
+3. 保存每个模型的原始结果、指标和运行配置。
+
+它不会调用论文表格汇总器，也不会自动创建 `paper_tables/`。
+
+运行完成以后，再独立汇总：
+
+```bash
+./summarize_latest_run.sh
+```
+
+要求本次 suite 的所有计划模型都完成：
+
+```bash
+./summarize_latest_run.sh --require-complete
+```
+
+或者指定运行目录：
+
+```bash
+python scripts/summarize_run.py \
+  runs/zero_shot/<suite目录名> \
+  --require-complete
+```
+
+汇总结果写入：
+
+```text
+runs/zero_shot/<suite>/paper_tables/
+├── README.md
+├── model_summary.csv
+├── model_summary.json
+├── l1_negative_over_edit.csv/.md
+├── difficulty_negative_over_edit.csv/.md
+└── register_negative_over_edit.csv/.md
+```
+
+## 4. 运行输出结构
+
+同一次命令中的所有模型共享同一个 suite 和同一个 manifest：
 
 ```text
 runs/zero_shot/<suite>/
 ├── sample_manifest.jsonl
 ├── suite_config.json
-├── model_comparison.csv
-├── model_comparison.json
-├── deepseek_v4_flash/
+├── deepseek_v4_pro/
 │   ├── results.jsonl
 │   ├── results.csv
 │   ├── metrics.json
+│   ├── run_config.json
 │   └── summary.txt
-└── deepseek_v4_pro/
+├── qwen3_7_plus/
+│   └── ...
+└── qwen3_5_9b_ollama/
     └── ...
 ```
 
-以后增加模型时，可冻结并复用同一份样本：
+需要后补模型时，复用已有 manifest：
+
+```bash
+./run_models.sh glm5_2_zhipu 100 \
+  --manifest runs/zero_shot/<suite>/sample_manifest.jsonl \
+  --run-dir runs/zero_shot/<suite>
+```
+
+这样新模型会写入同一个 suite，并与已有模型使用完全相同的样本。
+
+## 5. 底层通用运行器
+
+需要完整控制时，可以直接使用：
 
 ```bash
 python scripts/run_zero_shot.py \
-  --manifest runs/zero_shot/<suite>/sample_manifest.jsonl \
-  --models 新模型key
+  --dataset-kind negative \
+  --sample-size 100 \
+  --seed 42 \
+  --models deepseek_v4_pro qwen3_7_plus
 ```
 
-## 5. 接入其他 API 或本地小模型
+支持的主要参数：
 
-运行器使用 OpenAI-compatible Chat Completions 接口。DeepSeek、Qwen、GLM、OpenAI，
-以及通过 vLLM、Ollama 或 LM Studio 暴露的本地模型，都只需在
-`configs/models/zero_shot_models.json` 中增加配置，不改实验代码：
-
-```json
-{
-  "local_model": {
-    "provider": "openai_compatible",
-    "base_url": "http://localhost:8000/v1",
-    "api_key_env": "",
-    "model": "填写服务端暴露的模型名",
-    "temperature": 0.0,
-    "max_tokens": 512,
-    "size_label": "8B",
-    "parameter_count": "8B"
-  }
-}
-```
-
-然后：
-
-```bash
-python scripts/run_zero_shot.py --dataset-kind negative --sample-size 300 --models local_model
-```
+- `--dataset-kind negative|positive|mixed`
+- `--sample-size N` 或 `--full`
+- `--manifest PATH`
+- `--models MODEL_KEY ...`
+- `--seed N`
+- `--workers N`
+- `--requests-per-second N`
+- `--max-retries N`
+- `--run-dir PATH`
+- `--dry-run`
 
 ## 6. 数据抽样规则
 
 - 默认只保留 `处置=主集`。
-- 默认按 `L1类别` 比例分层抽样。
-- `--seed` 固定后，样本完全可复现。
-- `mixed` 指定样本量时默认 1:1，可用 `--negative-ratio` 调整。
-- `--split test` 可只跑指定切分。
-- `--exclude-controversial` 可排除争议样本。
-- 每次运行都会保存实际样本清单，后续模型必须复用该清单进行公平比较。
+- 默认按 `L1类别` 分层抽样。
+- 固定 `--seed` 后可复现。
+- `mixed` 默认 Negative/Positive 为 1:1，可用 `--negative-ratio` 调整。
+- 可用 `--split` 指定切分。
+- 可用 `--exclude-controversial` 排除争议样本。
+- 每次 suite 都保存实际 manifest，跨模型公平比较应复用该文件。
 
-## 7. 比较口径
+## 7. 指标口径
 
-- `strict_changed`：只忽略首尾空白，其他字符变化全部算修改。
+- `strict_changed`：只忽略首尾空白，其余字符变化均算修改。
 - `normalized_changed`：额外忽略 Unicode 全半角和空白格式差异。
-- Negative 主指标：`strict_over_edit_rate` 与 `content_over_edit_rate`。
-- Positive 只报告 `edit_trigger_rate`，不把它误称为改写成功率。
-- Mixed 的 accuracy/F1 是编辑触发代理指标，最终论文仍需独立评估去偏成功与语义保持。
+- Negative 主指标：`strict_over_edit_rate`、`content_over_edit_rate`。
+- Positive：报告 edit trigger，不将其误称为改写成功率。
+- Mixed 的 accuracy/F1 是编辑触发代理指标，不能替代去偏成功与语义保持评测。
 
 ## 8. 从 Excel 重新导出 JSONL
 
@@ -198,35 +249,4 @@ python scripts/export_main_jsonl.py \
   --output-dir data/source_jsonl
 ```
 
-该脚本只用于数据准备；正式 baseline 不依赖 Excel。
-## 9. 自动生成论文结果表
-
-五个小模型通过 `run_all_small_models.sh` 跑完后，会自动汇总最新一次 suite。也可以单独执行：
-
-```bash
-./summarize_latest_run.sh
-```
-
-指定某次运行目录：
-
-```bash
-python scripts/summarize_run.py \
-  runs/zero_shot/20260731T151151+0100_negative_100_seed42
-```
-
-结果写入该次运行的 `paper_tables/`：
-
-```text
-paper_tables/
-├── README.md                       # 可直接查看和复制的主结果表
-├── model_summary.csv               # 完整模型级指标
-├── model_summary.json              # 原始汇总，便于复现
-├── l1_negative_over_edit.csv/.md   # L1 类别分解
-├── difficulty_negative_over_edit.csv/.md
-└── register_negative_over_edit.csv/.md
-```
-
-主表优先展示 `NEG Content Over-edit`，同时保留 KEEP preservation、95% Wilson
-置信区间、strict over-edit、格式违规率和失败数。脚本会校验五个模型是否使用同一
-manifest、每个模型的实际样本数是否与 suite 一致；发现未跑完的数据时会明确警告。
-
+详细常用命令见 `command.md`。

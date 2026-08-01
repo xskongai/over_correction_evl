@@ -1,36 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 兼容入口：
+# Backward-compatible local-model entry.
+# Usage:
 #   bash scripts/run_local_suite.sh negative 100
 #   bash scripts/run_local_suite.sh negative full
 
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DATASET_KIND="${1:-negative}"
 SIZE="${2:-100}"
 shift $(( $# >= 2 ? 2 : $# )) || true
 
-MODEL_KEYS=(
-  qwen3_5_9b_ollama
-  glm4_9b_ollama
-  deepseek_r1_8b_ollama
-  llama3_1_8b_ollama
-  mistral_7b_ollama
-)
-
-if [[ "$SIZE" == "full" ]]; then
-  SIZE_ARGS=(--full)
-elif [[ "$SIZE" =~ ^[1-9][0-9]*$ ]]; then
-  SIZE_ARGS=(--sample-size "$SIZE")
-else
-  echo "样本数必须是正整数或 full" >&2
-  exit 2
-fi
-
-python scripts/run_zero_shot.py \
-  --dataset-kind "$DATASET_KIND" \
-  "${SIZE_ARGS[@]}" \
-  --seed 42 \
-  --workers 1 \
-  --max-retries 0 \
-  --models "${MODEL_KEYS[@]}" \
-  "$@"
+exec "$PROJECT_ROOT/run_models.sh" small "$SIZE" --dataset-kind "$DATASET_KIND" "$@"

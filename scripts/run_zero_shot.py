@@ -167,7 +167,6 @@ def main() -> int:
         except KeyboardInterrupt:
             print("\n收到中断；已完成结果均已落盘。", file=sys.stderr)
             return 130
-    _write_suite_summary(suite_dir, models)
     return exit_code
 
 
@@ -535,37 +534,6 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
             flat.update(row.get("metadata") or {})
             writer.writerow(flat)
 
-
-def _write_suite_summary(suite_dir: Path, models: Sequence[ModelConfig]) -> None:
-    rows: list[dict[str, Any]] = []
-    for model in models:
-        path = suite_dir / model.key / "metrics.json"
-        if not path.exists():
-            continue
-        m = json.loads(path.read_text(encoding="utf-8"))
-        rows.append({
-            "model_key": model.key,
-            "model": model.model,
-            "size_label": model.size_label,
-            "parameter_count": model.parameter_count,
-            "completed": m["overall"]["completed"],
-            "failed": m["overall"]["failed"],
-            "negative_n": m["overall"]["negative_n"],
-            "positive_n": m["overall"]["positive_n"],
-            "strict_over_edit_rate": m["negative"]["strict_over_edit_rate"],
-            "content_over_edit_rate": m["negative"]["content_over_edit_rate"],
-            "positive_edit_trigger_rate": m["positive"]["strict_edit_trigger_rate"],
-            "mixed_action_accuracy_proxy": m["strict"]["action_accuracy_proxy"],
-            "total_tokens": m["overall"]["total_tokens"],
-        })
-    (suite_dir / "model_comparison.json").write_text(
-        json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
-    if rows:
-        with (suite_dir / "model_comparison.csv").open("w", encoding="utf-8-sig", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=list(rows[0]))
-            writer.writeheader()
-            writer.writerows(rows)
 
 
 if __name__ == "__main__":

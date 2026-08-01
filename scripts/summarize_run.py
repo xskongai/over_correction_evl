@@ -37,6 +37,10 @@ PRETTY_MODEL_NAMES = {
     "qwen3_7_max": "Qwen3.7-Max",
     "glm5_2_zhipu": "GLM-5.2",
     "glm5_2_dashscope": "GLM-5.2",
+    "gpt_4o": "GPT-4o",
+    "gemini_3_6_flash": "Gemini-3.6-Flash",
+    "gemini_2_5_pro": "Gemini-2.5-Pro",
+    "gemini_2_5_flash": "Gemini-2.5-Flash",
 }
 
 

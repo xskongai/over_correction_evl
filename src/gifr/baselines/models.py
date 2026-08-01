@@ -34,7 +34,7 @@ class ModelConfig:
     model: str
     api_key_env: str = ""
     base_url_env: str = ""
-    temperature: float = 0.0
+    temperature: float | None = 0.0
     max_tokens: int = 512
     timeout_seconds: float = 120.0
     extra_body: dict[str, Any] = field(default_factory=dict)
@@ -65,6 +65,7 @@ class ModelConfig:
             raise ModelConfigError(
                 f"模型 {key!r} 的 base_url 为空；请设置 {base_url_env or 'base_url'}"
             )
+        raw_temperature = raw.get("temperature", 0.0)
         return cls(
             key=key,
             provider=provider,
@@ -72,7 +73,7 @@ class ModelConfig:
             model=str(raw["model"]),
             api_key_env=str(raw.get("api_key_env", "")),
             base_url_env=base_url_env,
-            temperature=float(raw.get("temperature", 0.0)),
+            temperature=(None if raw_temperature is None else float(raw_temperature)),
             max_tokens=int(raw.get("max_tokens", 512)),
             timeout_seconds=float(raw.get("timeout_seconds", 120.0)),
             extra_body=dict(raw.get("extra_body") or {}),
@@ -184,12 +185,13 @@ class OpenAICompatibleClient:
     def complete(self, prompt: str) -> Completion:
         payload: dict[str, Any] = {
             "model": self.config.model,
-            "temperature": self.config.temperature,
             "max_tokens": self.config.max_tokens,
             "stream": False,
             # 为保证 zero-shot 条件不被额外 system prompt 改变，完整提示词只作为一条 user 消息。
             "messages": [{"role": "user", "content": prompt}],
         }
+        if self.config.temperature is not None:
+            payload["temperature"] = self.config.temperature
         payload.update(self.config.extra_body)
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         headers = {"content-type": "application/json", **self.config.extra_headers}
