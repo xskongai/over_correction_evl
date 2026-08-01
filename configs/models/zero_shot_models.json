@@ -235,6 +235,17 @@
       "notes": "Local Mistral 7B v0.3 via Ollama.",
       "runtime": "ollama"
     },
+    "gemma2_9b_ollama": {
+      "display_name": "Gemma 2 9B",
+      "provider": "ollama",
+      "model": "gemma2:9b",
+      "base_url": "http://localhost:11434/v1",
+      "api_key_env": "OLLAMA_API_KEY",
+      "temperature": 0,
+      "max_tokens": 512,
+      "size": "small",
+      "thinking": false
+    },
     "gpt_4o": {
       "provider": "openai_compatible",
       "base_url": "https://api.openai.com/v1",

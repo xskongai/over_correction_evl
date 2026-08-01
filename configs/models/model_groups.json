@@ -7,7 +7,8 @@
         "glm4_9b_ollama",
         "deepseek_r1_8b_ollama",
         "llama3_1_8b_ollama",
-        "mistral_7b_ollama"
+        "mistral_7b_ollama",
+        "gemma2_9b_ollama"
       ]
     },
     "large": {
