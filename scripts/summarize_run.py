@@ -32,6 +32,7 @@ PRETTY_MODEL_NAMES = {
     "mistral_7b_ollama": "Mistral-7B",
     "deepseek_v4_flash": "DeepSeek-V4-Flash",
     "deepseek_v4_pro": "DeepSeek-V4-Pro",
+    "deepseek_v4_pro_thinking": "DeepSeek-V4-Pro",
     "qwen3_7_flash": "Qwen3.7-Flash",
     "qwen3_7_plus": "Qwen3.7-Plus",
     "qwen3_7_max": "Qwen3.7-Max",

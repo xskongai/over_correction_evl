@@ -14,7 +14,7 @@
     "large": {
       "description": "Hosted API benchmark models, including GPT-4o and Gemini 3.6 Flash.",
       "members": [
-        "deepseek_v4_flash_thinking",
+        "deepseek_v4_pro_thinking",
         "qwen3_7_plus",
         "glm5_2_zhipu_thinking",
         "gpt_4o",
