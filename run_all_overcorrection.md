@@ -1,14 +1,14 @@
-# 全模型全量 Overcorrection 运行
+# Full-Scale Overcorrection Run for All Models
 
-## 1. 确认模型列表
+## 1. Confirm the Model List
 
 ```bash
 ./run_models.sh all full --show-command
 ```
 
-确认输出中包含 `gemma2_9b_ollama`。
+Confirm that the output includes `gemma2_9b_ollama`.
 
-## 2. 运行全部模型 × 全量 Negative 数据
+## 2. Run All Models × Full Negative Dataset
 
 ```bash
 mkdir -p logs
@@ -18,17 +18,17 @@ caffeinate -dimsu ./run_models.sh all full \
   2>&1 | tee -a "logs/all_models_negative_full_$(date +%Y%m%d_%H%M%S).log"
 ```
 
-## 3. 中断后继续
+## 3. Resume After Interruption
 
-重新执行上面同一条命令。固定的 `--run-dir` 会复用已有结果并补跑未完成样本。
+Run the same command above again. The fixed `--run-dir` will reuse existing results and rerun only incomplete samples.
 
-## 4. 查看进度
+## 4. Check Progress
 
 ```bash
 tail -f "$(ls -t logs/all_models_negative_full_*.log | head -1)"
 ```
 
-## 5. 完成后汇总
+## 5. Summarize After Completion
 
 ```bash
 python scripts/summarize_run.py \
@@ -36,11 +36,11 @@ python scripts/summarize_run.py \
   --require-complete
 ```
 
-检查失败记录：
+Check for failed records:
 
 ```bash
 grep -R '"status": "failed"' \
   runs/zero_shot/all_models_negative_full/*/results.jsonl
 ```
 
-没有输出表示不存在失败记录。
+No output means that there are no failed records.
