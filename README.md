@@ -1,4 +1,4 @@
-# GIFR Zero-shot Baseline
+# Overcorrection Evaluation
 
 This project evaluates **over-editing / overcorrection in Chinese gender-inclusive rewriting**.
 
